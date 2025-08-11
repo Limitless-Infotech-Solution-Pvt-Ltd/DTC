@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import ThemeCustomizer from "@/components/theme-customizer"
+import FirstVisitPopup from "@/components/first-visit-popup"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito" })
@@ -30,6 +31,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
             <ThemeCustomizer />
+            <FirstVisitPopup />
           </div>
         </ThemeProvider>
       </body>

@@ -2,9 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,17 +12,29 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { Loader2, Mail, Lock, Eye, EyeOff, Github, Facebook, AlertCircle } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, Github, Facebook, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import SocialLoginButton from "@/components/auth/social-login-button"
+import { ThemeToggleAdvanced } from "@/components/theme-toggle-advanced"
+import LanguageSwitcher from "@/components/language-switcher"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [activeTab, setActiveTab] = useState("login")
   const { toast } = useToast()
+
+  // Check if there's a tab parameter in the URL
+  useEffect(() => {
+    const tab = searchParams.get("tab")
+    if (tab === "register") {
+      setActiveTab("register")
+    }
+  }, [searchParams])
 
   // Form state
   const [loginForm, setLoginForm] = useState({
@@ -71,15 +83,6 @@ export default function LoginPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      // In a real app, you would authenticate with your backend here
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(loginForm)
-      // })
-
-      // if (!response.ok) throw new Error('Login failed')
-
       toast({
         title: "Login successful!",
         description: "Welcome back to Dremers Talent Club.",
@@ -115,15 +118,6 @@ export default function LoginPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      // In a real app, you would register with your backend here
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(registerForm)
-      // })
-
-      // if (!response.ok) throw new Error('Registration failed')
-
       toast({
         title: "Registration successful!",
         description: "Your account has been created. Welcome to Dremers Talent Club!",
@@ -150,7 +144,12 @@ export default function LoginPage() {
             <p className="text-muted-foreground">Sign in to your account or create a new one</p>
           </div>
 
-          <Tabs defaultValue="login" className="w-full">
+          <div className="flex justify-center gap-4 mb-4">
+            <ThemeToggleAdvanced />
+            <LanguageSwitcher />
+          </div>
+
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
@@ -240,7 +239,26 @@ export default function LoginPage() {
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <svg
+                            className="mr-2 h-4 w-4 animate-spin"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
                           Signing in...
                         </>
                       ) : (
@@ -270,7 +288,7 @@ export default function LoginPage() {
                     Don't have an account?{" "}
                     <button
                       className="text-primary underline-offset-4 hover:underline"
-                      onClick={() => document.querySelector('[data-value="register"]')?.click()}
+                      onClick={() => setActiveTab("register")}
                     >
                       Register
                     </button>
@@ -388,7 +406,26 @@ export default function LoginPage() {
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <svg
+                            className="mr-2 h-4 w-4 animate-spin"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
                           Creating account...
                         </>
                       ) : (
@@ -418,7 +455,7 @@ export default function LoginPage() {
                     Already have an account?{" "}
                     <button
                       className="text-primary underline-offset-4 hover:underline"
-                      onClick={() => document.querySelector('[data-value="login"]')?.click()}
+                      onClick={() => setActiveTab("login")}
                     >
                       Sign in
                     </button>
