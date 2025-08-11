@@ -35,7 +35,7 @@ export default function PricingPage() {
                 </CardHeader>
                 <CardContent className="flex-1">
                   <div className="mb-4">
-                    <span className="text-4xl font-bold">${plan.price}</span>
+                    <span className="text-4xl font-bold">₹{plan.price}</span>
                     <span className="text-muted-foreground">/month</span>
                   </div>
                   <ul className="space-y-2 mb-6">
@@ -106,7 +106,7 @@ const pricingPlans = [
   {
     name: "Starter",
     description: "Perfect for small businesses just getting started with digital marketing.",
-    price: 999,
+    price: 9999,
     features: [
       "Social media management (2 platforms)",
       "Basic SEO optimization",
@@ -119,7 +119,7 @@ const pricingPlans = [
   {
     name: "Professional",
     description: "Ideal for growing businesses looking to expand their online presence.",
-    price: 1999,
+    price: 19999,
     featured: true,
     features: [
       "Social media management (4 platforms)",
@@ -136,7 +136,7 @@ const pricingPlans = [
   {
     name: "Enterprise",
     description: "For established businesses seeking comprehensive digital marketing solutions.",
-    price: 3999,
+    price: 39999,
     features: [
       "Social media management (all platforms)",
       "Advanced SEO strategy",
@@ -172,7 +172,7 @@ const faqs = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept all major credit cards, ACH transfers, and PayPal. Invoices are sent at the beginning of each month.",
+      "We accept all major Indian payment methods including UPI, Net Banking, Credit/Debit Cards, and Bank Transfers. All payments are processed in Indian Rupees (₹).",
   },
   {
     question: "Is there a setup fee?",

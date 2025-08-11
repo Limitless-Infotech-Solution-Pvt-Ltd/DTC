@@ -6,411 +6,283 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  BarChart,
-  LineChart,
-  Calendar,
-  Users,
-  DollarSign,
-  TrendingUp,
-  Bell,
-  Settings,
-  Plus,
-  Filter,
-  Download,
-  RefreshCw,
-} from "lucide-react"
-import DashboardChart from "@/components/dashboard/dashboard-chart"
+import { ArrowRight, ArrowUpRight, Download, Upload, Wallet, CreditCard } from "lucide-react"
 import DashboardSidebar from "@/components/dashboard/dashboard-sidebar"
+import DashboardChart from "@/components/dashboard/dashboard-chart"
+import TransactionItem from "@/components/payouts/transaction-item"
+
+// Sample transaction data
+const transactions = [
+  {
+    id: "tr_123456",
+    type: "deposit",
+    amount: 5000,
+    status: "completed",
+    date: "2023-06-15T10:30:00Z",
+    method: "UPI",
+    details: "UPI ID: user@okaxis",
+  },
+  {
+    id: "tr_123457",
+    type: "withdrawal",
+    amount: 2500,
+    status: "completed",
+    date: "2023-06-10T14:20:00Z",
+    method: "Bank Transfer",
+    details: "XXXX XXXX XXXX 4532",
+  },
+  {
+    id: "tr_123458",
+    type: "deposit",
+    amount: 10000,
+    status: "completed",
+    date: "2023-06-05T09:15:00Z",
+    method: "PayTM",
+    details: "PayTM Wallet",
+  },
+]
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview")
 
-  return (
-    <div className="flex min-h-screen">
-      <DashboardSidebar activeItem="dashboard" />
+  // Calculate balance and other metrics
+  const balance = 25000
+  const pendingWithdrawals = 7500
+  const availableBalance = balance - pendingWithdrawals
+  const totalEarnings = 50000
 
-      <div className="flex-1 overflow-auto">
-        <div className="border-b">
-          <div className="flex h-16 items-center justify-between px-4">
-            <div className="flex items-center gap-2 font-semibold">Dashboard</div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5" />
-                <span className="sr-only">Notifications</span>
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Settings className="h-5 w-5" />
-                <span className="sr-only">Settings</span>
-              </Button>
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
+  return (
+    <div className="flex min-h-screen flex-col">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Download Report
+            </Button>
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">Welcome back, John!</h1>
-                <p className="text-muted-foreground">Here's what's happening with your marketing campaigns today.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Campaign
-                </Button>
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-              </div>
-            </div>
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {metrics.map((metric, index) => (
-                <Card key={index}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
-                    <div className={`p-2 rounded-full bg-${metric.color}/10`}>{metric.icon}</div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{metric.value}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {metric.trend.direction === "up" ? "+" : "-"}
-                      {metric.trend.value} from last month
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-7">
+              <DashboardSidebar className="md:col-span-2" />
 
-            <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-              <div className="flex items-center justify-between">
-                <TabsList>
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                  <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-                  <TabsTrigger value="reports">Reports</TabsTrigger>
-                </TabsList>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filter
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Refresh
-                  </Button>
+              <div className="md:col-span-5 space-y-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">₹</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">₹{balance.toLocaleString("en-IN")}</div>
+                      <p className="text-xs text-muted-foreground">+₹10,000 from last month</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">₹</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">₹{availableBalance.toLocaleString("en-IN")}</div>
+                      <p className="text-xs text-muted-foreground">
+                        ₹{pendingWithdrawals.toLocaleString("en-IN")} pending withdrawals
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">₹</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">₹{totalEarnings.toLocaleString("en-IN")}</div>
+                      <p className="text-xs text-muted-foreground">Lifetime earnings</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Payment Methods</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">
+                        <ArrowUpRight className="h-4 w-4" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">2</div>
+                      <p className="text-xs text-muted-foreground">
+                        <Link href="/dashboard/settings/payment-methods" className="text-primary">
+                          Manage payment methods
+                        </Link>
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
-              </div>
 
-              <TabsContent value="overview" className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                  <Card className="lg:col-span-4">
+                  <Card className="col-span-4">
                     <CardHeader>
-                      <CardTitle>Performance Overview</CardTitle>
-                      <CardDescription>Website traffic and conversion metrics for the past 30 days</CardDescription>
+                      <CardTitle>Balance Overview</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
-                      <div className="h-[300px]">
-                        <DashboardChart />
-                      </div>
+                      <DashboardChart />
                     </CardContent>
                   </Card>
-                  <Card className="lg:col-span-3">
+                  <Card className="col-span-3">
                     <CardHeader>
-                      <CardTitle>Top Campaigns</CardTitle>
-                      <CardDescription>Your best performing marketing campaigns</CardDescription>
+                      <CardTitle>Recent Transactions</CardTitle>
+                      <CardDescription>Your recent deposits and withdrawals</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {campaigns.map((campaign, index) => (
-                          <div key={index} className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className={`p-2 rounded-full bg-${campaign.color}/10`}>{campaign.icon}</div>
-                              <div>
-                                <p className="text-sm font-medium">{campaign.name}</p>
-                                <p className="text-xs text-muted-foreground">{campaign.status}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant={campaign.status === "Active" ? "default" : "outline"}>
-                                {campaign.performance}
-                              </Badge>
-                            </div>
-                          </div>
+                        {transactions.map((transaction) => (
+                          <TransactionItem key={transaction.id} transaction={transaction} />
                         ))}
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button variant="outline" className="w-full">
-                        View All Campaigns
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link href="/dashboard/wallet">
+                          View All Transactions
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
                       </Button>
                     </CardFooter>
                   </Card>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Recent Activities</CardTitle>
-                      <CardDescription>Your recent marketing activities</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {activities.map((activity, index) => (
-                          <div key={index} className="flex items-start gap-4">
-                            <Avatar className="h-9 w-9">
-                              <AvatarImage src={activity.userAvatar} alt={activity.user} />
-                              <AvatarFallback>{activity.userInitials}</AvatarFallback>
-                            </Avatar>
-                            <div className="space-y-1">
-                              <p className="text-sm">
-                                <span className="font-medium">{activity.user}</span> {activity.action}
-                              </p>
-                              <p className="text-xs text-muted-foreground">{activity.time}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button variant="outline" className="w-full">
-                        View All Activities
-                      </Button>
-                    </CardFooter>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Upcoming Tasks</CardTitle>
-                      <CardDescription>Tasks that need your attention</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {tasks.map((task, index) => (
-                          <div key={index} className="flex items-start gap-4">
-                            <div
-                              className={`p-2 rounded-full bg-${task.priority === "High" ? "destructive" : task.priority === "Medium" ? "warning" : "primary"}/10`}
-                            >
-                              <Calendar
-                                className={`h-4 w-4 text-${task.priority === "High" ? "destructive" : task.priority === "Medium" ? "warning" : "primary"}`}
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-sm font-medium">{task.title}</p>
-                              <p className="text-xs text-muted-foreground">Due: {task.dueDate}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button variant="outline" className="w-full">
-                        View All Tasks
-                      </Button>
-                    </CardFooter>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Quick Links</CardTitle>
-                      <CardDescription>Frequently used tools and resources</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                      <CardTitle>Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 gap-4">
-                        {quickLinks.map((link, index) => (
-                          <Button key={index} variant="outline" className="justify-start" asChild>
-                            <Link href={link.href}>
-                              {link.icon}
-                              <span className="ml-2">{link.label}</span>
-                            </Link>
-                          </Button>
-                        ))}
+                        <Button className="flex flex-col items-center justify-center h-24" asChild>
+                          <Link href="/dashboard/wallet">
+                            <Wallet className="h-8 w-8 mb-2" />
+                            <span>Add Funds</span>
+                          </Link>
+                        </Button>
+                        <Button className="flex flex-col items-center justify-center h-24" asChild>
+                          <Link href="/dashboard/payouts">
+                            <Download className="h-8 w-8 mb-2" />
+                            <span>Withdraw</span>
+                          </Link>
+                        </Button>
+                        <Button className="flex flex-col items-center justify-center h-24" variant="outline" asChild>
+                          <Link href="/dashboard/settings/payment-methods">
+                            <CreditCard className="h-8 w-8 mb-2" />
+                            <span>Payment Methods</span>
+                          </Link>
+                        </Button>
+                        <Button className="flex flex-col items-center justify-center h-24" variant="outline" asChild>
+                          <Link href="/dashboard/support">
+                            <Upload className="h-8 w-8 mb-2" />
+                            <span>Get Support</span>
+                          </Link>
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Account Status</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">KYC Verification</span>
+                        <Badge className="bg-green-500">Verified</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Account Level</span>
+                        <Badge>Premium</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Payment Methods</span>
+                        <Badge variant="outline">2 Active</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Currency</span>
+                        <Badge variant="outline">INR (₹)</Badge>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" className="w-full" asChild>
+                        <Link href="/dashboard/settings">
+                          Manage Account
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </CardFooter>
+                  </Card>
                 </div>
-              </TabsContent>
+              </div>
+            </div>
+          </TabsContent>
 
-              <TabsContent value="analytics" className="space-y-4">
+          <TabsContent value="analytics" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-7">
+              <DashboardSidebar className="md:col-span-2" />
+              <div className="md:col-span-5">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Analytics</CardTitle>
-                    <CardDescription>Detailed analytics for your marketing campaigns</CardDescription>
+                    <CardTitle>Analytics Dashboard</CardTitle>
+                    <CardDescription>Detailed analytics will be displayed here</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">Analytics content will be displayed here</p>
-                    </div>
+                    <p className="text-center py-8 text-muted-foreground">Analytics features coming soon</p>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              </div>
+            </div>
+          </TabsContent>
 
-              <TabsContent value="campaigns" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Campaigns</CardTitle>
-                    <CardDescription>Manage your marketing campaigns</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">Campaigns content will be displayed here</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="reports" className="space-y-4">
+          <TabsContent value="reports" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-7">
+              <DashboardSidebar className="md:col-span-2" />
+              <div className="md:col-span-5">
                 <Card>
                   <CardHeader>
                     <CardTitle>Reports</CardTitle>
-                    <CardDescription>Generate and view marketing reports</CardDescription>
+                    <CardDescription>Generate and view reports</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">Reports content will be displayed here</p>
-                    </div>
+                    <p className="text-center py-8 text-muted-foreground">Reporting features coming soon</p>
                   </CardContent>
                 </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-7">
+              <DashboardSidebar className="md:col-span-2" />
+              <div className="md:col-span-5">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Notifications</CardTitle>
+                    <CardDescription>View your notifications</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-center py-8 text-muted-foreground">No new notifications</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )
 }
-
-const metrics = [
-  {
-    title: "Total Visitors",
-    value: "45,231",
-    icon: <Users className="h-4 w-4 text-primary" />,
-    color: "primary",
-    trend: { direction: "up", value: "12%" },
-  },
-  {
-    title: "Conversion Rate",
-    value: "3.2%",
-    icon: <TrendingUp className="h-4 w-4 text-primary" />,
-    color: "primary",
-    trend: { direction: "up", value: "0.5%" },
-  },
-  {
-    title: "Average Order",
-    value: "$45.65",
-    icon: <DollarSign className="h-4 w-4 text-primary" />,
-    color: "primary",
-    trend: { direction: "up", value: "7%" },
-  },
-  {
-    title: "Total Revenue",
-    value: "$12,426",
-    icon: <BarChart className="h-4 w-4 text-primary" />,
-    color: "primary",
-    trend: { direction: "up", value: "10%" },
-  },
-]
-
-const campaigns = [
-  {
-    name: "Summer Sale",
-    status: "Active",
-    performance: "+24%",
-    icon: <TrendingUp className="h-4 w-4 text-primary" />,
-    color: "primary",
-  },
-  {
-    name: "Product Launch",
-    status: "Active",
-    performance: "+18%",
-    icon: <TrendingUp className="h-4 w-4 text-primary" />,
-    color: "primary",
-  },
-  {
-    name: "Holiday Special",
-    status: "Scheduled",
-    performance: "Pending",
-    icon: <Calendar className="h-4 w-4 text-muted-foreground" />,
-    color: "muted-foreground",
-  },
-  {
-    name: "Email Newsletter",
-    status: "Active",
-    performance: "+12%",
-    icon: <TrendingUp className="h-4 w-4 text-primary" />,
-    color: "primary",
-  },
-]
-
-const activities = [
-  {
-    user: "John Doe",
-    userInitials: "JD",
-    userAvatar: "/placeholder.svg?height=36&width=36",
-    action: "created a new campaign",
-    time: "2 hours ago",
-  },
-  {
-    user: "Sarah Johnson",
-    userInitials: "SJ",
-    userAvatar: "/placeholder.svg?height=36&width=36",
-    action: "updated the SEO strategy",
-    time: "5 hours ago",
-  },
-  {
-    user: "Michael Chen",
-    userInitials: "MC",
-    userAvatar: "/placeholder.svg?height=36&width=36",
-    action: "added new analytics dashboard",
-    time: "Yesterday at 2:30 PM",
-  },
-]
-
-const tasks = [
-  {
-    title: "Review campaign performance",
-    dueDate: "Today",
-    priority: "High",
-  },
-  {
-    title: "Prepare monthly report",
-    dueDate: "Tomorrow",
-    priority: "Medium",
-  },
-  {
-    title: "Update social media calendar",
-    dueDate: "In 3 days",
-    priority: "Low",
-  },
-]
-
-const quickLinks = [
-  {
-    label: "Analytics",
-    href: "/dashboard/analytics",
-    icon: <BarChart className="h-4 w-4" />,
-  },
-  {
-    label: "Campaigns",
-    href: "/dashboard/campaigns",
-    icon: <TrendingUp className="h-4 w-4" />,
-  },
-  {
-    label: "Reports",
-    href: "/dashboard/reports",
-    icon: <LineChart className="h-4 w-4" />,
-  },
-  {
-    label: "Settings",
-    href: "/dashboard/settings",
-    icon: <Settings className="h-4 w-4" />,
-  },
-]
 

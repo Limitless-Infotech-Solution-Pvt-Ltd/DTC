@@ -8,4 +8,19 @@ export const Legend = () => <></>
 export const ResponsiveContainer = () => <></>
 export const Bar = () => <></>
 export const BarChart = () => <></>
+export const Chart = () => <></>
+export const ChartContainer = () => <></>
+export const ChartTooltip = () => <></>
+export const ChartTooltipContent = () => <></>
+export const ChartLegend = () => <></>
+export const ChartLegendContent = () => <></>
+export const ChartLegendItem = () => <></>
+export const ChartAreaSeries = () => <></>
+export const ChartArea = () => <></>
+export const ChartAxisOptions = () => <></>
+export const ChartAxisTickOptions = () => <></>
+export const ChartAxis = () => <></>
+export const ChartHeader = () => <></>
+export const ChartTitle = () => <></>
+export const ChartValueLabel = () => <></>
 

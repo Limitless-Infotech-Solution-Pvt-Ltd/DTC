@@ -12,29 +12,25 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { Mail, Lock, Eye, EyeOff, Github, Facebook, AlertCircle } from "lucide-react"
+import { Loader2, Mail, Lock, Eye, EyeOff, Github, Facebook, AlertCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import SocialLoginButton from "@/components/auth/social-login-button"
-import { ThemeToggleAdvanced } from "@/components/theme-toggle-advanced"
+import { ThemeToggle } from "@/components/theme-toggle"
 import LanguageSwitcher from "@/components/language-switcher"
+import { useAuth } from "@/components/auth-provider"
 
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const defaultTab = searchParams.get("tab") || "login"
+
+  const [activeTab, setActiveTab] = useState(defaultTab)
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
-  const [activeTab, setActiveTab] = useState("login")
   const { toast } = useToast()
-
-  // Check if there's a tab parameter in the URL
-  useEffect(() => {
-    const tab = searchParams.get("tab")
-    if (tab === "register") {
-      setActiveTab("register")
-    }
-  }, [searchParams])
+  const { login } = useAuth()
 
   // Form state
   const [loginForm, setLoginForm] = useState({
@@ -48,8 +44,20 @@ export default function LoginPage() {
     lastName: "",
     email: "",
     password: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+    },
     terms: false,
   })
+
+  useEffect(() => {
+    // Update the active tab when the URL parameter changes
+    setActiveTab(defaultTab)
+  }, [defaultTab])
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -61,10 +69,22 @@ export default function LoginPage() {
 
   const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
-    setRegisterForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
+
+    if (name.startsWith("address.")) {
+      const addressField = name.split(".")[1]
+      setRegisterForm((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [addressField]: value,
+        },
+      }))
+    } else {
+      setRegisterForm((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }))
+    }
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -80,13 +100,12 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Use the auth context login function
+      const success = await login(loginForm.email, loginForm.password)
 
-      toast({
-        title: "Login successful!",
-        description: "Welcome back to Dremers Talent Club.",
-      })
+      if (!success) {
+        throw new Error("Login failed")
+      }
 
       // Redirect to dashboard
       router.push("/dashboard")
@@ -102,7 +121,17 @@ export default function LoginPage() {
     setError("")
 
     // Validate form
-    if (!registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password) {
+    if (
+      !registerForm.firstName ||
+      !registerForm.lastName ||
+      !registerForm.email ||
+      !registerForm.password ||
+      !registerForm.address.street ||
+      !registerForm.address.city ||
+      !registerForm.address.state ||
+      !registerForm.address.zipCode ||
+      !registerForm.address.country
+    ) {
       setError("Please fill in all required fields")
       return
     }
@@ -120,11 +149,11 @@ export default function LoginPage() {
 
       toast({
         title: "Registration successful!",
-        description: "Your account has been created. Welcome to Dremers Talent Club!",
+        description: "Your account has been created. Welcome to Dreamers Talent Club!",
       })
 
-      // Redirect to dashboard
-      router.push("/dashboard")
+      // Redirect to KYC verification
+      router.push("/auth/kyc-verification")
     } catch (err) {
       setError("Registration failed. Please try again.")
     } finally {
@@ -138,15 +167,21 @@ export default function LoginPage() {
         <div className="mx-auto grid w-full max-w-md gap-6">
           <div className="flex flex-col items-center space-y-2 text-center">
             <Link href="/" className="flex items-center gap-2 font-bold text-2xl">
-              <span className="text-primary">Dremers</span> Talent Club
+              <span className="text-primary">Dreamers</span> Talent Club
             </Link>
             <h1 className="text-3xl font-bold">Welcome back</h1>
             <p className="text-muted-foreground">Sign in to your account or create a new one</p>
           </div>
 
-          <div className="flex justify-center gap-4 mb-4">
-            <ThemeToggleAdvanced />
-            <LanguageSwitcher />
+          <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <span className="text-sm text-muted-foreground">Theme</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <span className="text-sm text-muted-foreground">Language</span>
+            </div>
           </div>
 
           <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -239,26 +274,7 @@ export default function LoginPage() {
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? (
                         <>
-                          <svg
-                            className="mr-2 h-4 w-4 animate-spin"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Signing in...
                         </>
                       ) : (
@@ -382,6 +398,66 @@ export default function LoginPage() {
                         Password must be at least 8 characters long and include a number and a special character.
                       </p>
                     </div>
+
+                    {/* Address Fields for KYC */}
+                    <div className="space-y-2">
+                      <Label className="text-base font-medium">Address Information (for KYC Verification)</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="street">Street Address</Label>
+                        <Input
+                          id="street"
+                          name="address.street"
+                          value={registerForm.address.street}
+                          onChange={handleRegisterChange}
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="city">City</Label>
+                          <Input
+                            id="city"
+                            name="address.city"
+                            value={registerForm.address.city}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="state">State/Province</Label>
+                          <Input
+                            id="state"
+                            name="address.state"
+                            value={registerForm.address.state}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="zipCode">Zip/Postal Code</Label>
+                          <Input
+                            id="zipCode"
+                            name="address.zipCode"
+                            value={registerForm.address.zipCode}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="country">Country</Label>
+                          <Input
+                            id="country"
+                            name="address.country"
+                            value={registerForm.address.country}
+                            onChange={handleRegisterChange}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="terms"
@@ -406,26 +482,7 @@ export default function LoginPage() {
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? (
                         <>
-                          <svg
-                            className="mr-2 h-4 w-4 animate-spin"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Creating account...
                         </>
                       ) : (

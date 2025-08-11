@@ -2,11 +2,13 @@
 
 import type React from "react"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/auth-provider"
 
 interface SocialLoginButtonProps {
   provider: "google" | "github" | "facebook" | "twitter"
@@ -16,19 +18,35 @@ interface SocialLoginButtonProps {
 export default function SocialLoginButton({ provider, icon }: SocialLoginButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
+  const { login } = useAuth()
 
   const handleLogin = async () => {
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    toast({
-      title: "Social login",
-      description: `Login with ${provider} is not implemented in this demo.`,
-    })
+      // Use the auth context login function
+      await login("demo@example.com", "password123")
 
-    setIsLoading(false)
+      toast({
+        title: `Logged in with ${provider}`,
+        description: `You have successfully logged in with ${provider}.`,
+      })
+
+      // Redirect to dashboard
+      router.push("/dashboard")
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: `Failed to login with ${provider}. Please try again.`,
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const getIcon = () => {

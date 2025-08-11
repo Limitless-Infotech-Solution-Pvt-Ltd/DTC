@@ -1,333 +1,400 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  BanknoteIcon,
-  CreditCard,
-  Download,
-  Filter,
-  HelpCircle,
-  Loader2,
-  Plus,
-  Search,
-  Settings,
-  WalletIcon,
-} from "lucide-react"
+import { ArrowRight, ArrowUpRight, Download, Upload, AlertCircle, Info, Loader2 } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import DashboardSidebar from "@/components/dashboard/dashboard-sidebar"
 import TransactionItem from "@/components/payouts/transaction-item"
 
-export default function WalletPage() {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+// Sample transaction data
+const transactions = [
+  {
+    id: "tr_123456",
+    type: "deposit",
+    amount: 5000,
+    status: "completed",
+    date: "2023-06-15T10:30:00Z",
+    method: "UPI",
+    details: "UPI ID: user@okaxis",
+  },
+  {
+    id: "tr_123457",
+    type: "withdrawal",
+    amount: 2500,
+    status: "completed",
+    date: "2023-06-10T14:20:00Z",
+    method: "Bank Transfer",
+    details: "XXXX XXXX XXXX 4532",
+  },
+  {
+    id: "tr_123458",
+    type: "deposit",
+    amount: 10000,
+    status: "completed",
+    date: "2023-06-05T09:15:00Z",
+    method: "PayTM",
+    details: "PayTM Wallet",
+  },
+  {
+    id: "tr_123459",
+    type: "withdrawal",
+    amount: 7500,
+    status: "pending",
+    date: "2023-06-01T16:45:00Z",
+    method: "Bank Transfer",
+    details: "XXXX XXXX XXXX 4532",
+  },
+  {
+    id: "tr_123460",
+    type: "deposit",
+    amount: 15000,
+    status: "completed",
+    date: "2023-05-25T11:30:00Z",
+    method: "UPI",
+    details: "UPI ID: user@okaxis",
+  },
+  {
+    id: "tr_123461",
+    type: "withdrawal",
+    amount: 5000,
+    status: "failed",
+    date: "2023-05-20T13:10:00Z",
+    method: "Bank Transfer",
+    details: "XXXX XXXX XXXX 4532",
+    error: "Insufficient funds",
+  },
+]
 
-  const handleAddFunds = async (e: React.FormEvent) => {
-    e.preventDefault()
+export default function WalletPage() {
+  const { toast } = useToast()
+  const [amount, setAmount] = useState("")
+  const [withdrawalMethod, setWithdrawalMethod] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState("overview")
+
+  const handleDeposit = () => {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount to deposit.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsLoading(true)
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    toast({
-      title: "Funds added",
-      description: "Your funds have been successfully added to your wallet.",
-    })
-
-    setIsLoading(false)
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        title: "Deposit initiated",
+        description: `Your deposit of ₹${Number(amount).toLocaleString("en-IN")} has been initiated.`,
+      })
+      setAmount("")
+    }, 1500)
   }
 
-  return (
-    <div className="flex min-h-screen">
-      <DashboardSidebar activeItem="wallet" />
+  const handleWithdrawal = () => {
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount to withdraw.",
+        variant: "destructive",
+      })
+      return
+    }
 
-      <div className="flex-1 overflow-auto">
-        <div className="border-b">
-          <div className="flex h-16 items-center justify-between px-4">
-            <div className="flex items-center gap-2 font-semibold">Wallet</div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <HelpCircle className="mr-2 h-4 w-4" />
-                Help
-              </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard/settings/payment-methods">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Payment Settings
-                </Link>
-              </Button>
-            </div>
+    if (!withdrawalMethod) {
+      toast({
+        title: "Payment method required",
+        description: "Please select a payment method for withdrawal.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (Number(amount) < 1000) {
+      toast({
+        title: "Minimum withdrawal amount",
+        description: "The minimum withdrawal amount is ₹1,000.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false)
+      toast({
+        title: "Withdrawal requested",
+        description: `Your withdrawal of ₹${Number(amount).toLocaleString("en-IN")} has been requested.`,
+      })
+      setAmount("")
+      setWithdrawalMethod("")
+    }, 1500)
+  }
+
+  // Calculate balance and other metrics
+  const balance = 25000
+  const pendingWithdrawals = 7500
+  const availableBalance = balance - pendingWithdrawals
+  const totalEarnings = 50000
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">Wallet</h2>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
-                  <WalletIcon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">$2,500.00</div>
-                  <p className="text-xs text-muted-foreground">Available for use</p>
-                </CardContent>
-              </Card>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-7">
+          <DashboardSidebar className="md:col-span-2" />
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">$12,750.00</div>
-                  <p className="text-xs text-muted-foreground">Lifetime spending</p>
-                </CardContent>
-              </Card>
+          <div className="md:col-span-5 space-y-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="deposit">Deposit</TabsTrigger>
+                <TabsTrigger value="withdraw">Withdraw</TabsTrigger>
+              </TabsList>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Payment Methods</CardTitle>
-                  <BanknoteIcon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">3</div>
-                  <p className="text-xs text-muted-foreground">Active payment methods</p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="ghost" size="sm" className="w-full" asChild>
-                    <Link href="/dashboard/settings/payment-methods">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Method
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
+              <TabsContent value="overview" className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">₹</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">₹{balance.toLocaleString("en-IN")}</div>
+                      <p className="text-xs text-muted-foreground">+₹10,000 from last month</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">₹</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">₹{availableBalance.toLocaleString("en-IN")}</div>
+                      <p className="text-xs text-muted-foreground">
+                        ₹{pendingWithdrawals.toLocaleString("en-IN")} pending withdrawals
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">₹</div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">₹{totalEarnings.toLocaleString("en-IN")}</div>
+                      <p className="text-xs text-muted-foreground">Lifetime earnings</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Payment Methods</CardTitle>
+                      <div className="h-4 w-4 text-muted-foreground">
+                        <ArrowUpRight className="h-4 w-4" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">2</div>
+                      <p className="text-xs text-muted-foreground">
+                        <Link href="/dashboard/settings/payment-methods" className="text-primary">
+                          Manage payment methods
+                        </Link>
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
 
-            <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-              <div className="flex items-center justify-between">
-                <TabsList>
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="add-funds">Add Funds</TabsTrigger>
-                  <TabsTrigger value="transactions">Transactions</TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="overview" className="space-y-4 mt-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Wallet Overview</CardTitle>
-                    <CardDescription>Manage your wallet and view recent transactions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-medium">Recent Transactions</h3>
-                        <div className="space-y-2">
-                          <TransactionItem
-                            type="deposit"
-                            amount="500.00"
-                            date="June 5, 2023"
-                            status="completed"
-                            description="Added funds via Credit Card"
-                          />
-                          <TransactionItem
-                            type="withdrawal"
-                            amount="250.00"
-                            date="June 3, 2023"
-                            status="completed"
-                            description="Payment for Premium Plan"
-                          />
-                          <TransactionItem
-                            type="deposit"
-                            amount="1000.00"
-                            date="May 28, 2023"
-                            status="completed"
-                            description="Added funds via Bank Transfer"
-                          />
-                          <TransactionItem
-                            type="withdrawal"
-                            amount="750.00"
-                            date="May 20, 2023"
-                            status="completed"
-                            description="Payment for Marketing Campaign"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-medium">Quick Actions</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Button onClick={() => setActiveTab("add-funds")}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Funds
-                          </Button>
-                          <Button variant="outline" asChild>
-                            <Link href="/dashboard/billing">
-                              <CreditCard className="mr-2 h-4 w-4" />
-                              Manage Billing
-                            </Link>
-                          </Button>
-                          <Button variant="outline" asChild>
-                            <Link href="/dashboard/settings/payment-methods">
-                              <Settings className="mr-2 h-4 w-4" />
-                              Payment Methods
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="add-funds" className="space-y-4 mt-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Add Funds to Wallet</CardTitle>
-                    <CardDescription>Add money to your wallet using your preferred payment method</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleAddFunds} className="space-y-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="amount">Amount</Label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-3 text-muted-foreground">$</span>
-                          <Input
-                            id="amount"
-                            type="number"
-                            placeholder="0.00"
-                            className="pl-8"
-                            min="10"
-                            step="0.01"
-                            required
-                          />
-                        </div>
-                        <p className="text-xs text-muted-foreground">Minimum amount: $10.00</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="payment-method">Payment Method</Label>
-                        <Select defaultValue="card-1">
-                          <SelectTrigger id="payment-method">
-                            <SelectValue placeholder="Select payment method" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="card-1">Credit Card (****4242)</SelectItem>
-                            <SelectItem value="card-2">Debit Card (****7890)</SelectItem>
-                            <SelectItem value="paypal">PayPal (user@example.com)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="flex justify-end">
-                          <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                            <Link href="/dashboard/settings/payment-methods">Add new payment method</Link>
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="rounded-md bg-muted p-4">
-                        <div className="flex items-start gap-4">
-                          <HelpCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">Important Information</p>
-                            <p className="text-xs text-muted-foreground">
-                              Funds added to your wallet can be used for any purchases on our platform. There are no
-                              fees for adding funds. Funds in your wallet are non-refundable but can be used for any
-                              future purchases.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Button type="submit" className="w-full" disabled={isLoading}>
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          "Add Funds"
-                        )}
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="transactions" className="space-y-4 mt-4">
-                <Card>
-                  <CardHeader>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <CardTitle>Transaction History</CardTitle>
-                        <CardDescription>View all your wallet transactions</CardDescription>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="relative w-full md:w-auto">
-                          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="search"
-                            placeholder="Search transactions..."
-                            className="w-full md:w-[200px] pl-8"
-                          />
-                        </div>
-                        <Button variant="outline" size="icon">
-                          <Filter className="h-4 w-4" />
-                          <span className="sr-only">Filter</span>
-                        </Button>
-                        <Button variant="outline" size="icon">
-                          <Download className="h-4 w-4" />
-                          <span className="sr-only">Download</span>
-                        </Button>
-                      </div>
-                    </div>
+                    <CardTitle>Recent Transactions</CardTitle>
+                    <CardDescription>Your recent deposits and withdrawals</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {walletTransactions.map((transaction, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 rounded-lg border">
-                          <div className="flex items-center gap-4">
-                            <div
-                              className={`rounded-full p-2 ${transaction.type === "deposit" ? "bg-green-100" : "bg-muted"}`}
-                            >
-                              {transaction.type === "deposit" ? (
-                                <Plus className="h-4 w-4 text-green-600" />
-                              ) : (
-                                <CreditCard className="h-4 w-4 text-muted-foreground" />
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-medium">{transaction.description}</p>
-                              <p className="text-xs text-muted-foreground">{transaction.date}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className={`font-medium ${transaction.type === "deposit" ? "text-green-600" : ""}`}>
-                              {transaction.type === "deposit" ? "+" : "-"}${transaction.amount}
-                            </p>
-                            <Badge variant={transaction.status === "completed" ? "default" : "outline"}>
-                              {transaction.status}
-                            </Badge>
-                          </div>
-                        </div>
+                      {transactions.map((transaction) => (
+                        <TransactionItem key={transaction.id} transaction={transaction} />
                       ))}
-
-                      <div className="flex items-center justify-center">
-                        <Button variant="outline">Load More</Button>
-                      </div>
                     </div>
                   </CardContent>
+                  <CardFooter>
+                    <Button variant="outline" className="w-full">
+                      View All Transactions
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="deposit" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Deposit Funds</CardTitle>
+                    <CardDescription>Add money to your wallet using various payment methods</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="deposit-amount">Amount (₹)</Label>
+                      <Input
+                        id="deposit-amount"
+                        type="number"
+                        placeholder="Enter amount in ₹"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Payment Method</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Card className="cursor-pointer border-primary">
+                          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <div className="rounded-full bg-primary/10 p-2 mb-2">
+                              <img src="/placeholder.svg?height=24&width=24&text=UPI" alt="UPI" className="h-6 w-6" />
+                            </div>
+                            <div className="font-medium">UPI</div>
+                            <div className="text-xs text-muted-foreground">Instant transfer</div>
+                          </CardContent>
+                        </Card>
+                        <Card className="cursor-pointer">
+                          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <div className="rounded-full bg-primary/10 p-2 mb-2">
+                              <img
+                                src="/placeholder.svg?height=24&width=24&text=Bank"
+                                alt="Bank Transfer"
+                                className="h-6 w-6"
+                              />
+                            </div>
+                            <div className="font-medium">Bank Transfer</div>
+                            <div className="text-xs text-muted-foreground">NEFT/IMPS/RTGS</div>
+                          </CardContent>
+                        </Card>
+                        <Card className="cursor-pointer">
+                          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                            <div className="rounded-full bg-primary/10 p-2 mb-2">
+                              <img src="/placeholder.svg?height=24&width=24&text=Card" alt="Card" className="h-6 w-6" />
+                            </div>
+                            <div className="font-medium">Card</div>
+                            <div className="text-xs text-muted-foreground">Credit/Debit Card</div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertTitle>Information</AlertTitle>
+                      <AlertDescription>
+                        Deposits are typically processed instantly for UPI and within 24 hours for bank transfers. There
+                        are no fees for deposits.
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full" onClick={handleDeposit} disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Deposit Funds
+                        </>
+                      )}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="withdraw" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Withdraw Funds</CardTitle>
+                    <CardDescription>Withdraw money from your wallet to your preferred payment method</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="withdraw-amount">Amount (₹)</Label>
+                      <Input
+                        id="withdraw-amount"
+                        type="number"
+                        placeholder="Enter amount in ₹"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Available balance: ₹{availableBalance.toLocaleString("en-IN")}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="withdrawal-method">Withdrawal Method</Label>
+                      <Select value={withdrawalMethod} onValueChange={setWithdrawalMethod}>
+                        <SelectTrigger id="withdrawal-method">
+                          <SelectValue placeholder="Select withdrawal method" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="bank_transfer">Bank Account (HDFC Bank ****4532)</SelectItem>
+                          <SelectItem value="upi">UPI (user@okaxis)</SelectItem>
+                          <SelectItem value="add_new">+ Add New Payment Method</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Important</AlertTitle>
+                      <AlertDescription>
+                        <ul className="list-disc pl-4 space-y-1">
+                          <li>Minimum withdrawal amount is ₹1,000</li>
+                          <li>Withdrawals are processed within 1-3 business days</li>
+                          <li>A processing fee of ₹25 applies to all withdrawals</li>
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                  <CardFooter className="flex flex-col space-y-2">
+                    <Button className="w-full" onClick={handleWithdrawal} disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Withdraw Funds
+                        </>
+                      )}
+                    </Button>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href="/dashboard/settings/payment-methods">Manage Payment Methods</Link>
+                    </Button>
+                  </CardFooter>
                 </Card>
               </TabsContent>
             </Tabs>
@@ -337,63 +404,4 @@ export default function WalletPage() {
     </div>
   )
 }
-
-const walletTransactions = [
-  {
-    type: "deposit",
-    amount: "500.00",
-    date: "June 5, 2023",
-    status: "completed",
-    description: "Added funds via Credit Card",
-  },
-  {
-    type: "withdrawal",
-    amount: "250.00",
-    date: "June 3, 2023",
-    status: "completed",
-    description: "Payment for Premium Plan",
-  },
-  {
-    type: "deposit",
-    amount: "1000.00",
-    date: "May 28, 2023",
-    status: "completed",
-    description: "Added funds via Bank Transfer",
-  },
-  {
-    type: "withdrawal",
-    amount: "750.00",
-    date: "May 20, 2023",
-    status: "completed",
-    description: "Payment for Marketing Campaign",
-  },
-  {
-    type: "deposit",
-    amount: "300.00",
-    date: "May 15, 2023",
-    status: "completed",
-    description: "Added funds via PayPal",
-  },
-  {
-    type: "withdrawal",
-    amount: "125.00",
-    date: "May 10, 2023",
-    status: "completed",
-    description: "Payment for Social Media Ads",
-  },
-  {
-    type: "deposit",
-    amount: "800.00",
-    date: "May 5, 2023",
-    status: "completed",
-    description: "Added funds via Credit Card",
-  },
-  {
-    type: "withdrawal",
-    amount: "450.00",
-    date: "May 1, 2023",
-    status: "completed",
-    description: "Payment for SEO Services",
-  },
-]
 

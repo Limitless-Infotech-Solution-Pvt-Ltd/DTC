@@ -1,5 +1,3 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -22,7 +20,6 @@ import FeaturedClients from "@/components/home/featured-clients"
 import TestimonialCarousel from "@/components/home/testimonial-carousel"
 import BlogPreview from "@/components/home/blog-preview"
 import ThemeCustomizer from "@/components/theme-customizer"
-import FirstVisitPopup from "@/components/first-visit-popup"
 
 export default function Home() {
   return (
@@ -64,11 +61,8 @@ export default function Home() {
                   <Button
                     variant="ghost"
                     className="w-full justify-start gap-1 group-hover:text-primary transition-colors"
-                    asChild
                   >
-                    <Link href={`/services#${service.title.toLowerCase().replace(/\s+/g, "-")}`}>
-                      Learn more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Link>
+                    Learn more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </CardFooter>
               </Card>
@@ -227,7 +221,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form className="grid gap-4" action="/api/contact" method="POST">
+                <form className="grid gap-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label
@@ -238,10 +232,8 @@ export default function Home() {
                       </label>
                       <input
                         id="first-name"
-                        name="firstName"
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="John"
-                        required
                       />
                     </div>
                     <div className="space-y-2">
@@ -253,10 +245,8 @@ export default function Home() {
                       </label>
                       <input
                         id="last-name"
-                        name="lastName"
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         placeholder="Doe"
-                        required
                       />
                     </div>
                   </div>
@@ -270,10 +260,8 @@ export default function Home() {
                     <input
                       id="email"
                       type="email"
-                      name="email"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       placeholder="john.doe@example.com"
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -285,10 +273,8 @@ export default function Home() {
                     </label>
                     <textarea
                       id="message"
-                      name="message"
                       className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       placeholder="Tell us about your project..."
-                      required
                     />
                   </div>
                   <Button type="submit" className="w-full">
@@ -364,11 +350,7 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={() => window.dispatchEvent(new CustomEvent("open-get-started"))}
-              >
+              <Button size="lg" variant="secondary">
                 Get Started Today
               </Button>
             </div>
@@ -377,7 +359,6 @@ export default function Home() {
       </section>
 
       <ThemeCustomizer />
-      <FirstVisitPopup />
     </div>
   )
 }
